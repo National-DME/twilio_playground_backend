@@ -6,8 +6,14 @@ import com.twilio.type.PhoneNumber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.example.spring_boot.repository.TwilioRepository;
+
 @Service 
 public class TwilioService {
+
+    @Autowired
+    private TwilioRepository twilioRepository;
+
     @Value("${twilio.accountSid}")
     private String accountSid;
 
@@ -28,5 +34,10 @@ public class TwilioService {
             body
         ).create();
         return message.getSid();
+    }
+
+    public String saveMessage(String from, String body) {
+        SmsMessage smsMessage = new SmsMessage(from, body);
+        twilioRepository.save(smsMessage);
     }
 }
