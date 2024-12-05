@@ -3,7 +3,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/sms")
-public class SmsController {
+public class TwilioController {
 
     @Autowired
     private TwilioService twilioService;
