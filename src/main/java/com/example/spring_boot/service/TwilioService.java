@@ -1,12 +1,14 @@
-import com.twilio.Twilio;
-import com.twilio.converter.Promoter;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
+package com.example.spring_boot.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
 import com.example.spring_boot.repository.TwilioRepository;
+import com.example.spring_boot.entities.SmsMessage;
 
 @Service 
 public class TwilioService {
@@ -23,8 +25,13 @@ public class TwilioService {
     @Value("${twilio.phoneNumber}")
     private String twilioPhoneNumber;
 
-    public TwilioService() {
-        Twilio.init(accountSid, authToken);
+    @PostConstruct
+    public void init() {
+        if (accountSid != null && authToken != null) {
+            Twilio.init(accountSid, authToken);
+        } else {
+            throw new IllegalStateException("Twilio credentials are not set!");
+        }
     }
 
     public String sendMessage(String to, String body) {
@@ -36,7 +43,7 @@ public class TwilioService {
         return message.getSid();
     }
 
-    public String saveMessage(String from, String body) {
+    public void saveMessage(String from, String body) {
         SmsMessage smsMessage = new SmsMessage(from, body);
         twilioRepository.save(smsMessage);
     }
