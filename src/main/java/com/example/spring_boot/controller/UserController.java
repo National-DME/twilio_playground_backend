@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.example.spring_boot.dto.BaseResponse;
+import com.example.spring_boot.dto.DataResponse;
 import com.example.spring_boot.entities.User;
 import com.example.spring_boot.service.UserService;
 import java.util.List;
@@ -16,17 +19,26 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createUser(@RequestBody User user) {
+    public ResponseEntity<BaseResponse> createUser(@RequestBody User user) {
         try {
             userService.createUser(user.getName(), user.getPhoneNumber());
-            return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully!");
+            BaseResponse response = new BaseResponse("Success", "User created successfully");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating user: " + e.getMessage());
+            BaseResponse errorResponse = new BaseResponse("error", "Error creating user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    @GetMapping("/getAllUsers")
+    public ResponseEntity<DataResponse<List<User>>> getAllUsers() {
+        try {
+            List<User> users = userService.getAllUsers();
+            DataResponse<List<User>> response = new DataResponse<>("Success", "All users returned", users);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            DataResponse<List<User>> errorResponse = new DataResponse<List<User>>("error", "Error retrieving all users" + e.getMessage(), null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 }
