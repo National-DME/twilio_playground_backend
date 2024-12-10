@@ -40,11 +40,21 @@ public class TwilioService {
             new com.twilio.type.PhoneNumber(twilioPhoneNumber),
             body
         ).create();
+
+        SmsMessage smsMessage = new SmsMessage();
+        smsMessage.setFrom(twilioPhoneNumber);
+        smsMessage.setTo(to);
+        smsMessage.setBody(body);
+        smsMessage.setSentAt(message.getDateCreated());
+        smsMessage.setStatus(message.getStatus().toString());
+        smsMessage.setMessageSid(message.getSid());
+
+        twilioRepository.save(smsMessage);
+
         return message.getSid();
     }
 
-    public void saveMessage(String from, String body) {
-        SmsMessage smsMessage = new SmsMessage(from, body);
+    public void saveMessage(SmsMessage smsMessage) {
         twilioRepository.save(smsMessage);
     }
 }

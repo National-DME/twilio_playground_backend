@@ -1,5 +1,7 @@
 package com.example.spring_boot.controller;
 
+import java.time.ZonedDateTime;
+
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.spring_boot.entities.SmsMessage;
 import com.example.spring_boot.service.TwilioService;
-import org.springframework.util.MultiValueMap;
 
 @RestController
 @RequestMapping("/sms")
@@ -27,7 +28,20 @@ public class TwilioController {
     }
 
     @PostMapping("/incoming")
-    public void receiveMessage(@RequestBody MultiValueMap<String, String> formParams) {
-        
+    public void receiveMessage(
+        @RequestParam("From") String from,
+        @RequestParam("To") String to,
+        @RequestParam("Body") String body,
+        @RequestParam("MessageSid") String messageSid
+        ) {
+        SmsMessage smsMessage = new SmsMessage();
+        smsMessage.setFrom(from);
+        smsMessage.setTo(to);
+        smsMessage.setBody(body);
+        smsMessage.setMessageSid(messageSid);
+        smsMessage.setSentAt(ZonedDateTime.now());
+        smsMessage.setStatus("delivered");
+
+        twilioService.saveMessage(smsMessage);
     }
 }

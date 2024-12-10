@@ -1,7 +1,10 @@
 package com.example.spring_boot.entities;
 
-import java.time.LocalDateTime;
 
+
+import java.time.ZonedDateTime;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -9,24 +12,24 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
 @Entity
-@Table(name = "sms_messages")
+@Table(name = "messages")
 public class SmsMessage {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "sender")
     private String to;
+
+    @Column(name = "recipient")
     private String from;
+    
     private String body;
 
-    private LocalDateTime sentAt;
+    private ZonedDateTime sentAt;
     private String status;
-
-    public SmsMessage(String from, String body) {
-        this.from = from;
-        this.body = body;
-    }
+    private String messageSid;
 
     public Long getId() {
         return id;
@@ -52,11 +55,11 @@ public class SmsMessage {
         this.to = to;
     }
 
-    public LocalDateTime getSentAt() {
+    public ZonedDateTime getSentAt() {
         return sentAt;
     }
 
-    public void setSentAt(LocalDateTime sentAt) {
+    public void setSentAt(ZonedDateTime sentAt) {
         this.sentAt = sentAt;
     }
 
@@ -74,5 +77,13 @@ public class SmsMessage {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getMessageSid() {
+        return messageSid;
+    }
+
+    public void setMessageSid(String messageSid) {
+        this.messageSid = messageSid;
     }
 }
