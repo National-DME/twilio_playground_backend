@@ -9,6 +9,7 @@ import com.example.spring_boot.dto.BaseResponse;
 import com.example.spring_boot.dto.DataResponse;
 import com.example.spring_boot.entities.User;
 import com.example.spring_boot.service.UserService;
+
 import java.util.List;
 
 @RestController
@@ -38,6 +39,18 @@ public class UserController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             DataResponse<List<User>> errorResponse = new DataResponse<List<User>>("error", "Error retrieving all users" + e.getMessage(), null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseResponse> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            BaseResponse response = new BaseResponse("Success", "User with ID " + id + " was successfully deleted");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+        } catch (Exception e) {
+            BaseResponse errorResponse = new BaseResponse("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
