@@ -4,17 +4,27 @@ import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import jakarta.annotation.PostConstruct;
 
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
 import com.example.spring_boot.repository.TwilioRepository;
+import com.example.spring_boot.entities.SmsMedia;
 import com.example.spring_boot.entities.SmsMessage;
 
 @Service 
 public class TwilioService {
 
+    private static final Logger logger = LoggerFactory.getLogger(TwilioService.class);
+
     @Autowired
     private TwilioRepository twilioRepository;
+
+    @Autowired
+    private MediaService mediaService;
 
     @Value("${twilio.accountSid}")
     private String accountSid;
@@ -56,5 +66,23 @@ public class TwilioService {
 
     public void saveMessage(SmsMessage smsMessage) {
         twilioRepository.save(smsMessage);
+        if (smsMessage.getMedia().size() > 0) {
+            logger.info(smsMessage.getMedia().size() + " media files received");
+            for (SmsMedia media : smsMessage.getMedia()) {
+                try {
+                    media.setSmsMessage(smsMessage);
+
+                    String mediaUrl = media.getMediaUrl();
+                    String mediaContentType = media.getMediaContentType();
+                    logger.info(mediaContentType);
+                    logger.info(mediaUrl);
+                    mediaService.saveMedia(mediaUrl, mediaContentType);
+                } catch (IOException e) {
+                    logger.error("Cannot save media: " + media.getMediaUrl());
+                }
+            }
+        } else {
+            logger.info("No media files received");
+        }
     }
 }

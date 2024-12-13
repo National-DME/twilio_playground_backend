@@ -3,11 +3,14 @@ package com.example.spring_boot.entities;
 
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
@@ -30,6 +33,9 @@ public class SmsMessage {
     private ZonedDateTime sentAt;
     private String status;
     private String messageSid;
+
+    @OneToMany(mappedBy = "smsMessage", cascade =  CascadeType.ALL)
+    private List<SmsMedia> media;
 
     public Long getId() {
         return id;
@@ -85,5 +91,13 @@ public class SmsMessage {
 
     public void setMessageSid(String messageSid) {
         this.messageSid = messageSid;
+    }
+
+    public List<SmsMedia> getMedia() {
+        return media;
+    }
+
+    public void setMedia(List<SmsMedia> media) {
+        this.media = media;
     }
 }
