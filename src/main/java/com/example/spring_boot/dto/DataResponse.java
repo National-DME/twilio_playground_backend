@@ -1,5 +1,6 @@
 package com.example.spring_boot.dto;
 
+// Data response class; used to respond to HTTP requests; desgined to extend Base response; is base response with data field to return data of T type
 public class DataResponse<T> extends BaseResponse {
     private T data;
 

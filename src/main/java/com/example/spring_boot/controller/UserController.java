@@ -12,6 +12,7 @@ import com.example.spring_boot.service.UserService;
 
 import java.util.List;
 
+// Used for testing server instance of springboot API (basic users handling)
 @RestController
 @RequestMapping("/user")
 public class UserController {

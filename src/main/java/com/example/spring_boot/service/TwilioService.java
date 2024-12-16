@@ -4,37 +4,29 @@ import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import jakarta.annotation.PostConstruct;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
 import com.example.spring_boot.repository.TwilioRepository;
-import com.example.spring_boot.entities.SmsMedia;
 import com.example.spring_boot.entities.SmsMessage;
 
+// Service class; Used to handle business logic around twilio's API
 @Service 
 public class TwilioService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TwilioService.class);
-
+    // Repository that handles storing twilio data into local database
     @Autowired
     private TwilioRepository twilioRepository;
 
-    @Autowired
-    private MediaService mediaService;
-
+    // Environment variables to access twilio API
     @Value("${twilio.accountSid}")
     private String accountSid;
-
     @Value("${twilio.authToken}")
     private String authToken;
-
     @Value("${twilio.phoneNumber}")
     private String twilioPhoneNumber;
 
+    // Initializing twilio API interface
     @PostConstruct
     public void init() {
         if (accountSid != null && authToken != null) {
@@ -44,6 +36,7 @@ public class TwilioService {
         }
     }
 
+    // Called from controller classes, sends an SMS MESSAGE via twilio
     public String sendMessage(String to, String body) {
         Message message = Message.creator(
             new com.twilio.type.PhoneNumber(to),
@@ -64,6 +57,7 @@ public class TwilioService {
         return message.getSid();
     }
 
+    // Stores just an SMS to the messages table via the JPA repository
     public void saveMessage(SmsMessage smsMessage) {
         twilioRepository.save(smsMessage);
     }

@@ -7,6 +7,7 @@ import com.example.spring_boot.repository.UserRepository;
 import com.example.spring_boot.entities.User;
 import java.util.List;
 
+// Service class; used to test springboot instance
 @Service
 public class UserService {
 

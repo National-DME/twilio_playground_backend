@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+// User entity; used to interface with mysql; represents user table
 @Entity
 @Table(name = "users")
 public class User {

@@ -14,6 +14,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
+// SMS_MESSAGE entity; used to interface with mysql, represents the sms_message table
 @Entity
 @Table(name = "messages")
 public class SmsMessage {

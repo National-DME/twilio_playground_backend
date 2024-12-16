@@ -2,6 +2,7 @@ package com.example.spring_boot.entities;
 
 import jakarta.persistence.*;
 
+// SMS_MEDIA entity; used to interface with mysql; represents the sms_media table
 @Entity
 @Table(name = "sms_media")
 public class SmsMedia {

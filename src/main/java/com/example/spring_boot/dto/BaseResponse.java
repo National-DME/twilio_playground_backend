@@ -2,6 +2,7 @@ package com.example.spring_boot.dto;
 
 import java.time.LocalDateTime;
 
+// Base response class; used to respond to HTTP requests
 public class BaseResponse {
     private String status;
     private String message;
