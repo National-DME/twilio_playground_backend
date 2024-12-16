@@ -66,23 +66,5 @@ public class TwilioService {
 
     public void saveMessage(SmsMessage smsMessage) {
         twilioRepository.save(smsMessage);
-        if (smsMessage.getMedia().size() > 0) {
-            logger.info(smsMessage.getMedia().size() + " media files received");
-            for (SmsMedia media : smsMessage.getMedia()) {
-                try {
-                    media.setSmsMessage(smsMessage);
-
-                    String mediaUrl = media.getMediaUrl();
-                    String mediaContentType = media.getMediaContentType();
-                    logger.info(mediaContentType);
-                    logger.info(mediaUrl);
-                    mediaService.saveMedia(mediaUrl, mediaContentType);
-                } catch (IOException e) {
-                    logger.error("Cannot save media: " + media.getMediaUrl());
-                }
-            }
-        } else {
-            logger.info("No media files received");
-        }
     }
 }

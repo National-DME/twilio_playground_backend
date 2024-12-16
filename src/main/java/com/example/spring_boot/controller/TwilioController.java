@@ -1,5 +1,6 @@
 package com.example.spring_boot.controller;
 
+import java.io.IOError;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.spring_boot.entities.SmsMedia;
 import com.example.spring_boot.entities.SmsMessage;
+import com.example.spring_boot.service.MediaService;
 import com.example.spring_boot.service.TwilioService;
+
+import io.jsonwebtoken.io.IOException;
 
 @RestController
 @RequestMapping("/sms")
@@ -24,6 +28,9 @@ public class TwilioController {
 
     @Autowired
     private TwilioService twilioService;
+
+    @Autowired
+    private MediaService mediaService;
     
     @PostMapping("/send")
     public ResponseEntity<String> sendMessage(@RequestBody SmsMessage smsMessage) {
@@ -43,25 +50,13 @@ public class TwilioController {
         @RequestParam("MessageSid") String messageSid,
         @RequestParam(value = "NumMedia", required = false, defaultValue = "0") int numMedia,
         @RequestParam Map<String, String> allParams
-        ) {
+        ) throws java.io.IOException {
 
         logger.info("Received message");
         logger.info(numMedia + " files to process");
 
         List<SmsMedia> mediaList = new ArrayList<>();
         
-        for (int i = 0; i < numMedia; i++) {
-            String mediaUrl = allParams.get("MediaUrl" + i);
-            String mediaContentType = allParams.get("MediaContentType" + i);
-
-            if (mediaUrl != null && mediaContentType != null) {
-                SmsMedia media = new SmsMedia();
-                media.setMediaUrl(mediaUrl);
-                media.setMediaContentType(mediaContentType);
-                mediaList.add(media);
-            }
-        }
-
         SmsMessage smsMessage = new SmsMessage();
         smsMessage.setFrom(from);
         smsMessage.setTo(to);
@@ -69,8 +64,27 @@ public class TwilioController {
         smsMessage.setMessageSid(messageSid);
         smsMessage.setSentAt(ZonedDateTime.now());
         smsMessage.setStatus("delivered");
-        smsMessage.setMedia(mediaList);
+        
+        for (int i = 0; i < numMedia; i++) {
+            // Twilio URL is mediaUrl
+            String mediaUrl = allParams.get("MediaUrl" + i);
+            String mediaContentType = allParams.get("MediaContentType" + i);
 
+            if (mediaUrl != null && mediaContentType != null) {
+                try {
+                    SmsMedia media = new SmsMedia();
+                    String localMediaUrl = mediaService.saveMedia(mediaUrl, mediaContentType);
+                    media.setMediaUrl(localMediaUrl);
+                    media.setMediaContentType(mediaContentType);
+                    media.setSmsMessage(smsMessage);
+                    mediaList.add(media);
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                }
+            }
+        }
+
+        smsMessage.setMedia(mediaList);
         twilioService.saveMessage(smsMessage);
     }
 }

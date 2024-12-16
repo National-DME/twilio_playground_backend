@@ -11,7 +11,7 @@ public class SmsMedia {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "sms_message_id", referencedColumnName = "id")
+    @JoinColumn(name = "message_id", referencedColumnName = "id")
     private SmsMessage smsMessage;
 
     @Column(name = "media_url")
