@@ -68,8 +68,10 @@ public class TwilioService {
         smsMessage.setSentAt(message.getDateCreated());
         smsMessage.setStatus(message.getStatus().toString());
         smsMessage.setMessageSid(message.getSid());
+        // Linking media to sms message
         smsMessage.setMedia(media);
 
+        // Linking sms message to media foreign key
         if (media != null && !media.isEmpty()) {
             for (SmsMedia smsMedia : media) {
                 smsMedia.setSmsMessage(smsMessage);
