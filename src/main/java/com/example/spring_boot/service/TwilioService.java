@@ -2,12 +2,19 @@ package com.example.spring_boot.service;
 
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.rest.api.v2010.account.MessageCreator;
+
 import jakarta.annotation.PostConstruct;
+
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
 import com.example.spring_boot.repository.TwilioRepository;
+import com.example.spring_boot.entities.SmsMedia;
 import com.example.spring_boot.entities.SmsMessage;
 
 // Service class; Used to handle business logic around twilio's API
@@ -37,12 +44,22 @@ public class TwilioService {
     }
 
     // Called from controller classes, sends an SMS MESSAGE via twilio
-    public String sendMessage(String to, String body) {
-        Message message = Message.creator(
+    public String sendMessage(String to, String body, List<SmsMedia> media) {
+        MessageCreator messageCreator = Message.creator(
             new com.twilio.type.PhoneNumber(to),
             new com.twilio.type.PhoneNumber(twilioPhoneNumber),
             body
-        ).create();
+        );
+
+        if (media != null && !media.isEmpty()) {
+            List<URI> mediaUrls = media.stream()
+                .map(smsMedia -> URI.create(smsMedia.getMediaUrl()))
+                .collect(Collectors.toList());
+
+            messageCreator.setMediaUrl(mediaUrls);
+        }
+
+        Message message = messageCreator.create();
 
         SmsMessage smsMessage = new SmsMessage();
         smsMessage.setFrom(twilioPhoneNumber);
@@ -51,6 +68,13 @@ public class TwilioService {
         smsMessage.setSentAt(message.getDateCreated());
         smsMessage.setStatus(message.getStatus().toString());
         smsMessage.setMessageSid(message.getSid());
+        smsMessage.setMedia(media);
+
+        if (media != null && !media.isEmpty()) {
+            for (SmsMedia smsMedia : media) {
+                smsMedia.setSmsMessage(smsMessage);
+            }
+        }
 
         twilioRepository.save(smsMessage);
 

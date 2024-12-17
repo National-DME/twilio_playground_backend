@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class TwilioController {
     @PostMapping("/send")
     public ResponseEntity<String> sendMessage(@RequestBody SmsMessage smsMessage) {
         try {
-            String ssid = twilioService.sendMessage(smsMessage.getTo(), smsMessage.getBody());
+            String ssid = twilioService.sendMessage(smsMessage.getTo(), smsMessage.getBody(), smsMessage.getMedia());
             return ResponseEntity.status(HttpStatus.SC_ACCEPTED).body(ssid);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error sending message: " + e.getMessage());
